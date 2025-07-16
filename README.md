@@ -3,7 +3,7 @@
 Cubix3D is a Turing-complete language where you **program by rotating a cube**.  
 Each face of the cube represents a different **operation**, and values are stored in a fixed 3×3 grid per face.
 
-## 🧠 Design Philosophy
+## Design Philosophy
 
 - The cube is **fixed in memory**
 - You always operate on the center cell of the **Front face**: `F[1][1]`
@@ -12,7 +12,7 @@ Each face of the cube represents a different **operation**, and values are store
 
 ---
 
-## 🧩 Face Behaviors
+## Face Behaviors
 
 | Face | Meaning when rotated to Face                      |
 |------|---------------------------------------------------|
@@ -35,7 +35,7 @@ You can also use `'` (apostrophe) to rotate **counterclockwise**:
 | `R'`    | Rotate Right face Counter-clockwise  |
 ---
 
-## 🎮 Commands
+## Commands
 
 | Symbol  | Action                                                  |
 |---------|---------------------------------------------------------|
@@ -68,37 +68,14 @@ You can also use `'` (apostrophe) to rotate **counterclockwise**:
 
 ---
 
-## 🌀 Sample Program: Increment and Output
-
-This program:
-1. Loads from `U`
-2. Rotates to `L` to increment
-3. Rotates to `D` to output
-
-```text
-U L + D .
-```
-
----
-
-## 🧠 Implementation Notes
-
-- All data is stored as integers (0–255)
-- Only `F[1][1]` is operated on
-- You can extend face behaviors (`R` = XOR, `L` = bitshift, etc.)
-- Program state is fully visible via debug mode
-
----
-
 ## 💡 Future Extensions
 
-- Face functions can be **programmable**
-- Stack-based memory (map B as a stack?)
-- Multiple pointer modes
-- Cube macros: define movement sequences
+- Support for 180 moves like F2 or R2
+- Support for big cubes (like 5x5)
+- Support for moves like M, S, u, l, etc
 
 ---
 
-> Built for the Hack Club esolang challenge  
+> Built for the Hack Club Twist YSWS
 > By: Xiangrui ✨
 
