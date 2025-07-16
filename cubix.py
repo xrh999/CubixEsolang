@@ -151,11 +151,25 @@ class Cubix:
         self.faces[front][self.x][self.y] = int(input())
 
     def dump_front_face(self):
-        front = self.position_map['F']
+        front = self.faces(self.position_map['F'])
         print(self.faces[front])
 
     def dump_cube_state(self):
-        print(self.faces)
+        F, R, B, L, U, D = self.faces["F"], self.faces["R"], self.faces["B"], self.faces["L"], self.faces["U"], self.faces["D"]
+        def row_str(row): return " ".join(str(x) for x in row)
+
+        def padded(rows, letter):
+            return ["            [" + letter + "] " + row_str(row) for row in rows]
+
+        print("\n".join([
+            *padded(U, "U"),
+            "",
+            "[L] " + row_str(L[0]) + "   [F] " + row_str(F[0]) + "   [R] " + row_str(R[0]) + "   [B] " + row_str(B[0]),
+            "[L] " + row_str(L[1]) + "   [F] " + row_str(F[1]) + "   [R] " + row_str(R[1]) + "   [B] " + row_str(B[1]),
+            "[L] " + row_str(L[2]) + "   [F] " + row_str(F[2]) + "   [R] " + row_str(R[2]) + "   [B] " + row_str(B[2]),
+            "",
+            *padded(D, "D")
+        ]))
 
     def move_left(self):
         if self.x >= 0:
@@ -233,9 +247,9 @@ def parse_and_run(code, cubix):
             cubix.output_cell()
         elif cmd == ",":
             cubix.input_cell()
-        elif cmd == "d":
+        elif cmd == "p":
             cubix.dump_front_face()
-        elif cmd == "i":
+        elif cmd == "d":
             cubix.dump_cube_state()
         elif cmd == '<':
             cubix.move_left()
