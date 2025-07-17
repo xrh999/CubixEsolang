@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cubix Playground :)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
+  <style>
+    @keyframes fast-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .fast-blink {
+      animation: fast-blink 0.5s step-start infinite;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-emerald-200 to-blue-300 font-mono min-h-screen p-6">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Code Input -->
+    <div>
+      <h2 class="text-xl font-bold mb-2">Code Input</h2>
+      <textarea id="code" class="w-full h-80 p-3 rounded-lg border border-gray-400 bg-blue-200 resize-none" placeholder="Enter your Cubix code here...">+ + + .</textarea>
+      <button id="run" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">Run</button>
+      <button id="clear" class="mt-4 ml-2 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg shadow">Clear</button>
+    </div>
+
+    <!-- Output -->
+    <div>
+      <h2 class="text-xl font-bold mb-2">Output</h2>
+      <div id="output" class="w-full h-80 p-4 rounded-lg bg-black text-green-400 font-mono overflow-auto border border-gray-600 shadow-inner text-left whitespace-pre-wrap flex flex-col">
+        <div class="flex-1" id="outputContent">Waiting for code...</div>
+        <div class="flex items-center space-x-2 mt-2">
+          <span class="text-gray-400 fast-blink">|</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Inspirations --> 
+  <div class="px-4 py-6">
+    <h2 class="text-xl font-bold mb-2">Inspirations</h2>
+    <p class="mb-4">Cubix is a programming language designed to model the NxN Rubik's Cubes. This allows users to create and manipulate a 3D cube in a virtual environment. I have always been interested in cubing (since 8), and I hope to share the interest of cubing through this!! This Esolang uses Cubing notation, along with a few other special commands :)</p>
+  </div>
+
+  <!-- Commands -->
+  <div class="px-4 py-6">
+    <h2 class="text-xl font-bold mb-2">Commands</h2>
+    <ul class="list-disc list-inside mb-4">
+      <li><code>F</code> : Rotate Front face clockwise</li>
+      <li><code>F'</code> : Rotate Front face counterclockwise</li>
+      <li><code>B</code> : Rotate Back face clockwise</li>
+      <li><code>B'</code> : Rotate Back face counterclockwise</li>
+      <li><code>R</code> : Rotate Right face clockwise</li>
+      <li><code>R'</code> : Rotate Right face counterclockwise</li>
+      <li><code>L</code> : Rotate Left face clockwise</li>
+      <li><code>L'</code> : Rotate Left face counterclockwise</li>
+      <li><code>U</code> : Rotate Up face clockwise</li>
+      <li><code>U'</code> : Rotate Up face counterclockwise</li>
+      <li><code>D</code> : Rotate Down face clockwise</li>
+      <li><code>D'</code> : Rotate Down face counterclockwise</li>
+      <li><code>X</code> : Rotate entire cube around X axis clockwise</li>
+      <li><code>X'</code> : Rotate entire cube around X axis counterclockwise</li>
+      <li><code>Y</code> : Rotate entire cube around Y axis clockwise</li>
+      <li><code>Y'</code> : Rotate entire cube around Y axis counterclockwise</li>
+      <li><code>Z</code> : Rotate entire cube around Z axis clockwise</li>
+      <li><code>Z'</code> : Rotate entire cube around Z axis counterclockwise</li>
+      <li><code>+</code> : Increment the front center cell</li>
+      <li><code>-</code> : Decrement the front center cell</li>
+      <li><code>.</code> : Output front center cell value</li>
+      <li><code>,</code> : Input value into front center cell</li>
+      <li><code>[N](...)</code> : Repeat enclosed code N times</li>
+      <li><code>d</code> : Dump cube state to output</li>
+      <li><code>i</code> : Dump front face only</li>
+      <li><code>p</code> : Print current cursor position</li>
+      <li><code>&lt;</code> : Move cursor left</li>
+      <li><code>&gt;</code> : Move cursor right</li>
+      <li><code>^</code> : Move cursor up</li>
+      <li><code>v</code> : Move cursor down</li>
+      <li><code>"name" { ... }</code> : Define a function with name <code>name</code></li>
+      <li><code>$name$</code> : Call the previously defined function <code>name</code></li>
+    </ul>
+  </div>
+
+  <script type="module">
+    const outputContent = document.getElementById("outputContent");
+    const runBtn = document.getElementById("run");       // match your button id
+    const clearBtn = document.getElementById("clear");   // match your button id
+    const codeInput = document.getElementById("code");   // match your textarea id
+    
+    const pyodide = await loadPyodide();
+    
+    // Load Cubix interpreter
+    const cubixResponse = await fetch("cubix.py");
+    const cubixCode = await cubixResponse.text();
+    await pyodide.runPythonAsync(cubixCode);
+    
+    // Clear button
+    clearBtn.addEventListener("click", () => {
+      codeInput.value = "";
+      outputContent.textContent = "Waiting for code...";
+    });
+    
+    // Run button
+    runBtn.addEventListener("click", async () => {
+      outputContent.textContent = "";
+    
+      const code = codeInput.value;
+      const safeCode = code.replace(/\\/g, "\\\\").replace(/"""/g, '\\"\\"\\"');
+    
+      // Hook Python input() to browser prompt()
+      pyodide.setStdin(() => {
+        return prompt("Input requested by Python:") || "";
+      });
+    
+      try {
+        const result = await pyodide.runPythonAsync(`run_code("""${safeCode}""")`);
+        outputContent.textContent = result || "(no output)";
+      } catch (err) {
+        outputContent.textContent = "Exception: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
