@@ -92,7 +92,7 @@
     const pyodide = await loadPyodide();
     
     // Load Cubix interpreter
-    const cubixResponse = await fetch("cubix.py");
+    const cubixResponse = await fetch("cubix_playground.py");
     const cubixCode = await cubixResponse.text();
     await pyodide.runPythonAsync(cubixCode);
     
